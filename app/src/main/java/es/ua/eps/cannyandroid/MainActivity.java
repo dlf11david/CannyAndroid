@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 
+import com.google.android.material.slider.Slider;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
@@ -17,6 +19,9 @@ import org.opencv.imgproc.Imgproc;
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
+    private int blurValue;
+    private int gradientValue;
+    private int angleValue;
     private static String TAG = "MainActivity";
     JavaCameraView javaCameraView;
     Mat mRgba, imgGray, imgCanny;
@@ -49,6 +54,22 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         javaCameraView = (JavaCameraView)findViewById(R.id.java_camera_view);
         javaCameraView.setVisibility(SurfaceView.VISIBLE);
         javaCameraView.setCvCameraViewListener(this);
+
+        Slider blurSlider = findViewById(R.id.blurSlider);
+        Slider gradientSlider = findViewById(R.id.gradientSlider);
+        Slider angleSlider = findViewById(R.id.angleSlider);
+
+        blurSlider.addOnChangeListener((slider, value, fromUser) -> {
+            blurValue = Math.round(value);
+        });
+
+        gradientSlider.addOnChangeListener((slider, value, fromUser) -> {
+            gradientValue = Math.round(value);
+        });
+
+        angleSlider.addOnChangeListener((slider, value, fromUser) -> {
+            angleValue = Math.round(value);
+        });
 
     }
 
@@ -96,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
         mRgba = inputFrame.rgba();
 
         Imgproc.cvtColor(mRgba, imgGray, Imgproc.COLOR_RGB2GRAY);
-        Imgproc.Canny(imgGray, imgCanny, 50, 150);
+        Imgproc.Canny(imgGray, imgCanny, blurValue, gradientValue);
 
         return imgCanny;
     }
